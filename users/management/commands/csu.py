@@ -4,7 +4,7 @@ from users.models import User
 
 
 class Command(BaseCommand):
-    help = 'Create a super user'
+    help = "Create a super user"
 
     def handle(self, *args, **options):
         user = User.objects.create(email="adm@1.ru")

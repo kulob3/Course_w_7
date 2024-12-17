@@ -10,12 +10,9 @@ class HabitViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Filter habits by the logged-in user
-        if self.action == 'list':
+        if self.action == "list":
             return Habit.objects.filter(user=self.request.user)
         return super().get_queryset()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-

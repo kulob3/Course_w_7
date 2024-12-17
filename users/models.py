@@ -32,7 +32,9 @@ class User(AbstractUser):
         verbose_name="avatar",
         help_text="Optional. Image file.",
     )
-    tg_chat_id = models.CharField(max_length=50, verbose_name="telegram chat id", blank=True, null=True)
+    tg_chat_id = models.CharField(
+        max_length=50, verbose_name="telegram chat id", blank=True, null=True
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -40,6 +42,3 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "user"
         verbose_name_plural = "users"
-
-
-

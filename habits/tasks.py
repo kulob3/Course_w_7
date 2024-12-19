@@ -1,6 +1,8 @@
 from celery import shared_task
 import requests
 from django.utils import timezone
+from requests import RequestException
+
 from config.settings import TELEGRAM_TOKEN
 from habits.models import Reminder
 import logging
@@ -8,16 +10,27 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@shared_task
-def send_telegram_message(chat_id, text):
-    try:
-        token = TELEGRAM_TOKEN
-        url = f"https://api.telegram.org/bot{token}/sendMessage"
-        data = {"chat_id": chat_id, "text": text}
-        requests.post(url, data=data)
-    except Exception as e:
-        logger.error(f"Failed to send message to chat_id {chat_id}: {e}")
+# @shared_task
+# def send_telegram_message(chat_id, text):
+#     try:
+#         token = TELEGRAM_TOKEN
+#         url = f"https://api.telegram.org/bot{token}/sendMessage"
+#         data = {"chat_id": chat_id, "text": text}
+#         requests.post(url, data=data)
+#     except Exception as e:
+#         logger.error(f"Failed to send message to chat_id {chat_id}: {e}")
 
+@shared_task(
+    autoretry_for=(RequestException,),
+    retry_backoff=True,
+    retry_kwargs={'max_retries': 5},
+)
+def send_telegram_message(chat_id, text):
+    token = TELEGRAM_TOKEN
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    data = {"chat_id": chat_id, "text": text}
+    response = requests.post(url, data=data)
+    response.raise_for_status()
 
 @shared_task
 def check_reminders():
